@@ -21,8 +21,8 @@ public class MapSection {
 	}
 
 	public MapSection() throws IOException{
-		URL url = new URL("https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
-		imageSection = ImageIO.read(url);
+		URL nonLabelurl = new URL("https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000&style=feature:all|element:labels|visibility:off&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
+		imageSection = ImageIO.read(nonLabelurl);
 		imageSection = processImage(imageSection);
 		writeImage(imageSection);
 	}
