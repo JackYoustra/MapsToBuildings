@@ -7,6 +7,7 @@ import java.awt.image.ShortLookupTable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
@@ -29,6 +30,54 @@ public class MapSection {
 	
 	private static void writeImage(RenderedImage ri) throws IOException{
 		ImageIO.write(ri, "png", new File("DebugImage.png"));
+	}
+	
+	private static BufferedImage processImagePixally(final BufferedImage image){
+		BufferedImage img = new BufferedImage(
+			    image.getWidth(), 
+			    image.getHeight(), 
+			    BufferedImage.TYPE_INT_ARGB);
+		ColorConvertOp cco = new ColorConvertOp(null);
+		cco.filter(image, img);
+		
+		for (int x = 0; x < img.getWidth(); x++) {
+			for (int y = 0; y < img.getHeight(); y++) {
+				int px = img.getRGB(x, y);
+				int alpha = (px >> 24) & 0xFF;
+				int red = (px >> 16) & 0xFF;
+				int green = (px >> 8) & 0xFF;
+				int blue = px & 0xFF;
+			    // do stuff here
+				
+				// standard is to do nothing
+				/*
+				if(red == 242 && green == 240 && blue == 233){
+					// is the standard color
+					//red = blue = green = 255;
+					
+				}
+				*/
+				int diff = 0;
+				// could optimize
+				int[] diffCandidates = {red, green, blue};
+				Arrays.sort(diffCandidates); 
+				diff = diffCandidates[2] - diffCandidates[0];
+				
+				if(12 > diff && diff > 6){
+					// should be fair game
+					
+				}
+				else{
+					red = blue = green = 0;
+				}
+				
+				// end do stuff
+				int pixel = (alpha<<24) + (red<<16) + (green<<8) + blue;
+		        img.setRGB(x, y, pixel);
+		    }
+		}
+		
+		return img;
 	}
 	
 	private static BufferedImage processImage(final BufferedImage image){
