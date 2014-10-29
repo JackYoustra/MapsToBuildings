@@ -24,12 +24,12 @@ public class MapSection {
 	public MapSection() throws IOException{
 		URL nonLabelurl = new URL("https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000&style=feature:all|element:labels|visibility:off&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
 		imageSection = ImageIO.read(nonLabelurl);
-		imageSection = processImage(imageSection);
+		imageSection = processImagePixally(imageSection);
 		writeImage(imageSection);
 	}
 	
 	private static void writeImage(RenderedImage ri) throws IOException{
-		ImageIO.write(ri, "png", new File("DebugImage.png"));
+		ImageIO.write(ri, "png", new File("DebugImageWithPixel.png"));
 	}
 	
 	private static BufferedImage processImagePixally(final BufferedImage image){
@@ -57,13 +57,14 @@ public class MapSection {
 					
 				}
 				*/
+				// the trick here is to limit it to a particular band of grey
 				int diff = 0;
 				// could optimize
 				int[] diffCandidates = {red, green, blue};
 				Arrays.sort(diffCandidates); 
 				diff = diffCandidates[2] - diffCandidates[0];
 				
-				if(12 > diff && diff > 6){
+				if(11 >= diff && diff >= 3){
 					// should be fair game
 					
 				}
