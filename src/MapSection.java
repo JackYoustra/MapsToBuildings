@@ -21,18 +21,18 @@ public class MapSection {
 		return imageSection;
 	}
 
-	public MapSection() throws IOException{
+	public MapSection(int toleranceMax, int toleranceMin) throws IOException{
 		URL nonLabelurl = new URL("https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000&style=feature:all|element:labels|visibility:off&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
 		imageSection = ImageIO.read(nonLabelurl);
-		imageSection = processImagePixally(imageSection);
-		writeImage(imageSection);
+		imageSection = processImagePixally(imageSection, toleranceMax, toleranceMin);
+		writeImage(imageSection, "Max_" + toleranceMax + " Min_" + toleranceMin);
 	}
 	
-	private static void writeImage(RenderedImage ri) throws IOException{
-		ImageIO.write(ri, "png", new File("DebugImageWithPixel.png"));
+	private static void writeImage(RenderedImage ri, String name) throws IOException{
+		ImageIO.write(ri, "png", new File("DebugImage" + "\\" + name + ".png"));
 	}
 	
-	private static BufferedImage processImagePixally(final BufferedImage image){
+	private static BufferedImage processImagePixally(final BufferedImage image, int toleranceMax, int toleranceMin){
 		BufferedImage img = new BufferedImage(
 			    image.getWidth(), 
 			    image.getHeight(), 
@@ -48,29 +48,29 @@ public class MapSection {
 				int green = (px >> 8) & 0xFF;
 				int blue = px & 0xFF;
 			    // do stuff here
-				
-				// standard is to do nothing
-				/*
+				// different color for tops of buildings
 				if(red == 242 && green == 240 && blue == 233){
-					// is the standard color
 					//red = blue = green = 255;
-					
-				}
-				*/
-				// the trick here is to limit it to a particular band of grey
-				int diff = 0;
-				// could optimize
-				int[] diffCandidates = {red, green, blue};
-				Arrays.sort(diffCandidates); 
-				diff = diffCandidates[2] - diffCandidates[0];
-				
-				if(11 >= diff && diff >= 3){
-					// should be fair game
-					
+					blue = 255;
+					green = red = 0;
 				}
 				else{
-					red = blue = green = 0;
+					// the trick here is to limit it to a particular band of grey
+					int diff = 0;
+					// could optimize
+					int[] diffCandidates = {red, green, blue};
+					Arrays.sort(diffCandidates); 
+					diff = diffCandidates[2] - diffCandidates[0];
+					
+					if(toleranceMax >= diff && diff >= toleranceMin){
+						// should be fair game
+						
+					}
+					else{
+						red = blue = green = 0;
+					}
 				}
+				
 				
 				// end do stuff
 				int pixel = (alpha<<24) + (red<<16) + (green<<8) + blue;
