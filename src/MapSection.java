@@ -25,11 +25,12 @@ public class MapSection {
 		URL nonLabelurl = new URL("https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000&style=feature:all|element:labels|visibility:off&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
 		imageSection = ImageIO.read(nonLabelurl);
 		imageSection = processImagePixally(imageSection, toleranceMax, toleranceMin);
-		writeImage(imageSection, "Max_" + toleranceMax + " Min_" + toleranceMin);
+		//writeImage(imageSection, "Max_" + toleranceMax + " Min_" + toleranceMin);
 	}
 	
 	private static void writeImage(RenderedImage ri, String name) throws IOException{
-		ImageIO.write(ri, "png", new File("DebugImage" + "\\" + name + ".png"));
+		new File("DebugImage").mkdirs();
+		ImageIO.write(ri, "png", new File("DebugImage" + File.separator + name + ".png"));
 	}
 	
 	private static BufferedImage processImagePixally(final BufferedImage image, int toleranceMax, int toleranceMin){
@@ -49,10 +50,14 @@ public class MapSection {
 				int blue = px & 0xFF;
 			    // do stuff here
 				// different color for tops of buildings
+				
 				if(red == 242 && green == 240 && blue == 233){
 					//red = blue = green = 255;
 					blue = 255;
 					green = red = 0;
+				}
+				else if(red == 196 && green == 196 && blue == 212){
+					//red = blue = green = 255;
 				}
 				else{
 					// the trick here is to limit it to a particular band of grey
