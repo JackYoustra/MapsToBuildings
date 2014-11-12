@@ -1,5 +1,7 @@
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.awt.image.LookupOp;
 import java.awt.image.LookupTable;
 import java.awt.image.RenderedImage;
@@ -8,8 +10,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
+
+import com.jhlabs.image.DilateFilter;
+import com.jhlabs.image.ErodeFilter;
+import com.jhlabs.image.ReduceNoiseFilter;
 
 
 public class MapSection {
@@ -57,7 +64,7 @@ public class MapSection {
 					green = red = 0;
 				}
 				else if(red == 196 && green == 196 && blue == 212){
-					//red = blue = green = 255;
+					// fair game, magic unformulaic value for dark zones
 				}
 				else{
 					// the trick here is to limit it to a particular band of grey
@@ -83,6 +90,12 @@ public class MapSection {
 		    }
 		}
 		
+		DilateFilter df = new DilateFilter();
+		img = df.filter(img, null);
+		
+		ErodeFilter ef = new ErodeFilter();
+		img = ef.filter(img, null);
+		
 		return img;
 	}
 	
@@ -94,7 +107,6 @@ public class MapSection {
 			    BufferedImage.TYPE_INT_RGB);
 		ColorConvertOp cco = new ColorConvertOp(null);
 		cco.filter(image, finalImage);
-		
 		
 		short[] red = new short[256];
 		short[] green = new short[256];
