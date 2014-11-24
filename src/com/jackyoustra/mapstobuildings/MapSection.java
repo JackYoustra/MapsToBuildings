@@ -129,23 +129,53 @@ public class MapSection {
 	
 	public Polygon[] buildingCoordinatesInImageStar(){
 		int[][] pixels = pixelsFromBufferedImage(imageSection);
-		Point sample = new Point(237, 75);
-		Point[] coordinatePoints = starRunner(pixels, sample.x, sample.y, new ArrayList<Point>());
+		List<Point> bluePointList = new ArrayList<>();
+		List<Polygon> buildings = new ArrayList<>();
 		
-		int[] xes = new int[coordinatePoints.length];
-		int[] ys = new int[coordinatePoints.length];
-		for(int coordCounter = 0; coordCounter < coordinatePoints.length; coordCounter++){
-			final Point temp = coordinatePoints[coordCounter];
-			xes[coordCounter] = temp.x;
-			ys[coordCounter] = temp.y;
+		for(int x = 0; x < pixels.length; x++){
+			for(int y = 0; y < pixels.length; y++){
+				int px = pixels[x][y];
+				int blue = (int) (px & 0xFF);
+				if(blue==255){ // is standard blue hue
+					bluePointList.add(new Point(x, y));
+				}
+			}
 		}
-		Polygon[] border = {new Polygon(xes, ys, coordinatePoints.length)};
+		Point oldPoint = new Point(-1, -1);
+		while(bluePointList.size() > 0){
+			//System.out.println(bluePointList.size());
+			Point currentPoint = bluePointList.get(0);
+			if(oldPoint.equals(currentPoint)){
+				bluePointList.remove(0);
+				continue;
+				// make sure no repetition happens
+			}
+			oldPoint = currentPoint;
+			Point[] coordinatePoints = starRunner(pixels, currentPoint.x, currentPoint.y, new ArrayList<Point>());			
+			
+			int[] xes = new int[coordinatePoints.length];
+			int[] ys = new int[coordinatePoints.length];
+			for(int coordCounter = 0; coordCounter < coordinatePoints.length; coordCounter++){
+				final Point temp = coordinatePoints[coordCounter];
+				xes[coordCounter] = temp.x;
+				ys[coordCounter] = temp.y;
+				for(int i = 0; i < bluePointList.size(); i++){
+					if(bluePointList.get(i).equals(temp)){
+						bluePointList.remove(i);
+						i--;
+					}
+				}
+			}
+			Polygon border = new Polygon(xes, ys, coordinatePoints.length);
+			buildings.add(border);				// clean list
+			cleanList(bluePointList, border); // make sure to go through all
+		}
 		
-		return border;
+		return buildings.toArray(new Polygon[0]);
 	}
 	
 	public Point[] starRunner(int[][] screen, int x, int y, List<Point> blueList){
-		if(x < 0 || y < 0 || x > screen.length || y > screen[0].length) return new Point[0];
+		if(x < 0 || y < 0 || x >= screen.length || y >= screen[0].length) return new Point[0];
 		
 		Color pixelColor = new Color(screen[x][y], true);
 		if(!(pixelColor.getBlue() == 255 && pixelColor.getGreen() == 0 && pixelColor.getRed() == 0)){
