@@ -28,7 +28,7 @@ public class TestShell {
 			BufferedImage bi = ms.getImageSection();
 			JFrame window = new JFrame("Image Section");
 			
-			Polygon[] buildingsBounds = ms.buildingCoordinatesInImageStar();
+			Polygon[] buildingsBounds = ms.buildingCoordinatesInImage();
 			for(Polygon cp : buildingsBounds){
 				for(int i = 0; i < cp.npoints; i++){
 					for(int x = 0, y = 0; x < 4; x++, y++){
