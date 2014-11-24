@@ -1,6 +1,8 @@
 package com.jackyoustra.mapstobuildings;
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.awt.image.ConvolveOp;
@@ -33,9 +35,16 @@ public class MapSection {
 		return imageSection;
 	}
 
-	public MapSection(int toleranceMax, int toleranceMin) throws IOException{
-		URL nonLabelurl = new URL("https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000&style=feature:all|element:labels|visibility:off&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
-		imageSection = ImageIO.read(nonLabelurl);
+	public MapSection(int toleranceMax, int toleranceMin, boolean local) throws IOException{
+		if(local){
+			File pictureHandle = new File("C:\\Users\\Jack\\Pictures\\staticmapnolabel.png");
+			imageSection = ImageIO.read(pictureHandle);
+		}
+		else{
+			URL nonLabelurl = new URL("https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000&style=feature:all|element:labels|visibility:off&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
+			imageSection = ImageIO.read(nonLabelurl);
+		}
+		
 		imageSection = processImagePixally(imageSection, toleranceMax, toleranceMin);
 		writeImage(imageSection, "cleanedImage");
 		//writeImage(imageSection, "Max_" + toleranceMax + " Min_" + toleranceMin);
@@ -53,6 +62,7 @@ public class MapSection {
 		int[][] pixels = pixelsFromBufferedImage(imageSection);
 		List<Point> bluePointList = new ArrayList<>();
 		List<Polygon> buildings = new ArrayList<>();
+		/*
 		for(int x = 0; x < pixels.length; x++){
 			for(int y = 0; y < pixels.length; y++){
 				int px = pixels[x][y];
@@ -62,10 +72,13 @@ public class MapSection {
 				}
 			}
 		}
+		*/
+		bluePointList.add(new Point(237, 75));
 		// bluePointList now has all blue points
 		
 		// get individual building coordinate
 		while(bluePointList.size() > 0){ // no iterator needed, clear array of current one anyway
+			System.out.println("Size: " + bluePointList.size());
 			Point currentPoint = bluePointList.get(0);
 			// Diagonals
 			Point[] upLeft = diagonalRunner(pixels, currentPoint.x, currentPoint.y, DiagonalDirections.UPPER_LEFT);
@@ -108,7 +121,7 @@ public class MapSection {
 			buildings.add(border);
 			// clean list
 			cleanList(bluePointList, border); // make sure to go through all
-			System.out.println("" + bluePointList.size());
+			
 		}
 		// convert array
 		return buildings.toArray(new Polygon[0]);
@@ -149,8 +162,9 @@ public class MapSection {
 		if(x < 0 || y < 0 || x >= pixels.length || y >= pixels[0].length){ // not inside bounds
 			return new Point[0];
 		}
+		Color currentPixel = new Color(pixels[x][y], true);
 		int blue = (int) (pixels[x][y] & 0xFF);
-		if(blue == 255){ // is blue
+		if(currentPixel.getBlue() == 255 && currentPixel.getRed() == 0 && currentPixel.getGreen() == 0){ // is blue
 			LinearDirections horDir = null, vertDir = null;
 			
 			switch(dir){
@@ -287,31 +301,4 @@ public class MapSection {
 		return img;
 	}
 	
-	private static BufferedImage processImage(final BufferedImage image){
-		// init lookup table to zero
-		BufferedImage finalImage = new BufferedImage(
-			    image.getWidth(), 
-			    image.getHeight(), 
-			    BufferedImage.TYPE_INT_RGB);
-		ColorConvertOp cco = new ColorConvertOp(null);
-		cco.filter(image, finalImage);
-		
-		short[] red = new short[256];
-		short[] green = new short[256];
-		short[] blue = new short[256];
-		
-		// set to default values
-		red[242] = 255;
-		green[240] = 255;
-		blue[233] = 255;
-		
-		// hold all data for table
-		short[][] data = new short[][]{
-				red, green, blue
-		};
-		LookupTable lookupTable = new ShortLookupTable(0, data);
-		LookupOp op = new LookupOp(lookupTable, null);
-		op.filter(finalImage, finalImage);
-		return finalImage;
-	}
 }
