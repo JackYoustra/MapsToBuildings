@@ -2,6 +2,12 @@ package com.jackyoustra.mapstobuildings;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -71,7 +77,7 @@ public class MapSection {
 		}
 		Point oldPoint = new Point(-1, -1);
 		while(bluePointList.size() > 0){
-			//System.out.println(bluePointList.size());
+			System.out.println(bluePointList.size());
 			Point currentPoint = bluePointList.get(0);
 			if(oldPoint.equals(currentPoint)){
 				bluePointList.remove(0);
@@ -99,7 +105,26 @@ public class MapSection {
 			cleanList(bluePointList, border); // make sure to go through all
 		}
 		
+		// clean buildings
+		for(int i = 0; i < buildings.size(); i++){
+			Polygon building = buildings.get(i);
+			int area = polyArea(building);
+			if(area < 9){
+				buildings.remove(i);
+				i--;
+			}
+		}
+		
 		return buildings.toArray(new Polygon[0]);
+	}
+	
+	public static int polyArea(Polygon target){
+		int sum = 0;
+        for (int i = 0; i < target.npoints ; i++){
+            sum = sum + target.xpoints[i]*target.ypoints[(i+1)%target.npoints] - target.ypoints[i]*target.xpoints[(i+1)%target.npoints];
+        }
+
+        return Math.abs(sum / 2);
 	}
 	
 	public Point[] starRunner(int[][] screen, int x, int y, List<Point> blueList){

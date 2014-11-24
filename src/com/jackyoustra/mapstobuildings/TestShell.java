@@ -31,13 +31,11 @@ public class TestShell {
 			Polygon[] buildingsBounds = ms.buildingCoordinatesInImage();
 			for(Polygon cp : buildingsBounds){
 				for(int i = 0; i < cp.npoints; i++){
-					for(int x = 0, y = 0; x < 4; x++, y++){
-						//bi.setRGB(cp.xpoints[i]-2+x, cp.ypoints[i]-2+y, new Color(0, 255, 0).getRGB());
-					}
 					bi.setRGB(cp.xpoints[i], cp.ypoints[i], new Color(0, 255, 0).getRGB());
 				}
 			}
-			ImageIO.write(bi, "png", new File("outlinedImage" + ".png"));
+			ImageIO.write(bi, "png", new File("cleanedOutlinedImage" + ".png"));
+			
 			window.add(new JLabel(new ImageIcon(bi)));
 			
 			window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
