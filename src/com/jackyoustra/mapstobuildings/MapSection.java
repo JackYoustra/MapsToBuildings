@@ -127,6 +127,60 @@ public class MapSection {
 		return buildings.toArray(new Polygon[0]);
 	}
 	
+	public Polygon[] buildingCoordinatesInImageStar(){
+		int[][] pixels = pixelsFromBufferedImage(imageSection);
+		Point sample = new Point(237, 75);
+		Point[] coordinatePoints = starRunner(pixels, sample.x, sample.y, new ArrayList<Point>());
+		
+		int[] xes = new int[coordinatePoints.length];
+		int[] ys = new int[coordinatePoints.length];
+		for(int coordCounter = 0; coordCounter < coordinatePoints.length; coordCounter++){
+			final Point temp = coordinatePoints[coordCounter];
+			xes[coordCounter] = temp.x;
+			ys[coordCounter] = temp.y;
+		}
+		Polygon[] border = {new Polygon(xes, ys, coordinatePoints.length)};
+		
+		return border;
+	}
+	
+	public Point[] starRunner(int[][] screen, int x, int y, List<Point> blueList){
+		if(x < 0 || y < 0 || x > screen.length || y > screen[0].length) return new Point[0];
+		
+		Color pixelColor = new Color(screen[x][y], true);
+		if(!(pixelColor.getBlue() == 255 && pixelColor.getGreen() == 0 && pixelColor.getRed() == 0)){
+			// not blue
+			Point[] containerArr = {new Point(x, y)};
+			return containerArr;
+		}
+		boolean didEndSoon = false;
+		for(Point p : blueList){
+			if(p.x == x && p.y == y){
+				didEndSoon = true;
+				break;
+			}
+		}
+		if(didEndSoon){
+			// is on list
+			return new Point[0];
+		}
+		
+		blueList.add(new Point(x, y));
+		
+		// not on list, blue, so valid, untouched pixel
+		Point[] up = starRunner(screen, x, y+1, blueList);
+		Point[] down = starRunner(screen, x, y-1, blueList);
+		Point[] right = starRunner(screen, x+1, y, blueList);
+		Point[] left = starRunner(screen, x-1, y, blueList);
+		
+		Point[] totalArr = new Point[up.length + down.length + right.length + left.length];
+		System.arraycopy(up, 0, totalArr, 0, up.length);
+		System.arraycopy(down, 0, totalArr, up.length, down.length);
+		System.arraycopy(right, 0, totalArr, up.length + down.length, right.length);
+		System.arraycopy(left, 0, totalArr, up.length+down.length+right.length, left.length);
+		return totalArr;
+	}
+	
 	// cleans list of all blue contained in borders, return number of stuff removed
 	private int cleanList(List<Point> blueList, Polygon borders){
 		int numRemoved = 0;
