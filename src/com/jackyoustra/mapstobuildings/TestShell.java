@@ -27,14 +27,7 @@ public class TestShell {
 			//window.add(new JLabel(new ImageIcon(bi)));
 			BufferedImage bi = ms.getImageSection();
 			JFrame window = new JFrame("Image Section");
-			
-			Polygon[] buildingsBounds = ms.buildingCoordinatesInImage();
-			for(Polygon cp : buildingsBounds){
-				for(int i = 0; i < cp.npoints; i++){
-					bi.setRGB(cp.xpoints[i], cp.ypoints[i], new Color(0, 255, 0).getRGB());
-				}
-			}
-			ImageIO.write(bi, "png", new File("cleanedOutlinedImage" + ".png"));
+			//drawPolygon(bi, ms);
 			
 			window.add(new JLabel(new ImageIcon(bi)));
 			
@@ -42,9 +35,19 @@ public class TestShell {
 			window.pack();
 			window.setVisible(true);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static void drawPolygon(BufferedImage bi, MapSection ms) throws IOException{
+		Polygon[] buildingsBounds = ms.buildingCoordinatesInImage();
+		for(Polygon cp : buildingsBounds){
+			for(int i = 0; i < cp.npoints; i++){
+				bi.setRGB(cp.xpoints[i], cp.ypoints[i], new Color(0, 255, 0).getRGB());
+			}
+		}
+		ImageIO.write(bi, "png", new File("cleanedOutlinedImage" + ".png"));
+
 	}
 
 }
