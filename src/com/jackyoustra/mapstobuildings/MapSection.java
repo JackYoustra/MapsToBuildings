@@ -27,6 +27,13 @@ public class MapSection {
 	/** The image section. */
 	private BufferedImage imageSection;
 	
+	/** The max tolerance for the grayscale band. */
+	public final int MAX_TOLERANCE = 11;
+	
+	/** The min tolerance for the grayscale band. */
+	public final int MIN_TOLERANCE = 1;
+	
+	
 	/**
 	 * Gets the underlying image section.
 	 *
@@ -39,12 +46,10 @@ public class MapSection {
 	/**
 	 * Instantiates a new building-processed map section.
 	 *
-	 * @param toleranceMax the tolerance max
-	 * @param toleranceMin the tolerance min
 	 * @param local choose to access a local sample instead of retrieving from the internet
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public MapSection(int toleranceMax, int toleranceMin, boolean local) throws IOException{
+	public MapSection(boolean local) throws IOException{
 		if(local){
 			File pictureHandle = new File("C:\\Users\\Jack\\Pictures\\staticmapnolabel.png");
 			imageSection = ImageIO.read(pictureHandle);
@@ -54,9 +59,9 @@ public class MapSection {
 			imageSection = ImageIO.read(nonLabelurl);
 		}
 		
-		imageSection = processImagePixally(imageSection, toleranceMax, toleranceMin);
+		imageSection = processImagePixally(imageSection, MAX_TOLERANCE, MIN_TOLERANCE);
 		writeImage(imageSection, "cleanedImage");
-		//writeImage(imageSection, "Max_" + toleranceMax + " Min_" + toleranceMin);
+		//writeImage(imageSection, "Max_" + MAX_TOLERANCE + " Min_" + MIN_TOLERANCE);
 	}
 	
 	/**
@@ -237,11 +242,11 @@ public class MapSection {
 	 * This is done by creating a band of tolerable greys and eradicating them, as well as some other special values.
 	 *
 	 * @param image the map square to be processed (as an image)
-	 * @param toleranceMax the tolerance max for the greyscale bound.
-	 * @param toleranceMin the tolerance min for the greyscale bound.
+	 * @param tolerancemax the tolerance max for the greyscale bound.
+	 * @param tolerancemin the tolerance min for the greyscale bound.
 	 * @return the cleaned image
 	 */
-	private static BufferedImage processImagePixally(final BufferedImage image, int toleranceMax, int toleranceMin){
+	private static BufferedImage processImagePixally(final BufferedImage image, int tolerancemax, int tolerancemin){
 		BufferedImage img = new BufferedImage(
 			    image.getWidth(), 
 			    image.getHeight(), 
@@ -275,7 +280,7 @@ public class MapSection {
 					Arrays.sort(diffCandidates); 
 					diff = diffCandidates[2] - diffCandidates[0];
 					
-					if(toleranceMax >= diff && diff >= toleranceMin){
+					if(tolerancemax >= diff && diff >= tolerancemin){
 						// should be fair game
 						
 					}

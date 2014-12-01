@@ -23,7 +23,7 @@ public class TestShell {
 	 */
 	public static void main(String[] args) {
 		try {
-			MapSection ms = new MapSection(11, 1, true);
+			MapSection ms = new MapSection(true);
 			
 			//window.add(new JLabel(new ImageIcon(bi)));
 			BufferedImage bi = ms.getImageSection();
