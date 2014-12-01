@@ -1,24 +1,25 @@
 package com.jackyoustra.mapstobuildings;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 
+/**
+ * The Class TestShell. This is used to test the functionality of the main map processing unit
+ */
 public class TestShell {
 
 	/**
-	 * @param args
+	 * The main method.
+	 *
+	 * @param args the command-line arguments
 	 */
 	public static void main(String[] args) {
 		try {
@@ -39,6 +40,13 @@ public class TestShell {
 		}
 	}
 	
+	/**
+	 * Draw building polygons over image.
+	 *
+	 * @param bi the buffered image to write on
+	 * @param ms the underlying map section
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void drawPolygon(BufferedImage bi, MapSection ms) throws IOException{
 		Polygon[] buildingsBounds = ms.buildingCoordinatesInImage();
 		for(Polygon cp : buildingsBounds){
