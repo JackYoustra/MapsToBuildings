@@ -18,15 +18,10 @@ import com.jhlabs.image.DilateFilter;
 import com.jhlabs.image.ErodeFilter;
 
 
-/**
- * The Class MapSection describes a section of map gotten from the googleAPIs and isolated for buildings.
- */
 public class MapSection {
 	
 	// https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000
-	/** The image section. */
 	private BufferedImage imageSection;
-	
 	/** The max tolerance for the grayscale band. */
 	public final int MAX_TOLERANCE = 11;
 	
@@ -42,7 +37,6 @@ public class MapSection {
 	public BufferedImage getImageSection() {
 		return imageSection;
 	}
-
 	/**
 	 * Instantiates a new building-processed map section.
 	 *
@@ -64,23 +58,11 @@ public class MapSection {
 		//writeImage(imageSection, "Max_" + MAX_TOLERANCE + " Min_" + MIN_TOLERANCE);
 	}
 	
-	/**
-	 * Write image.
-	 *
-	 * @param ri the rendered image
-	 * @param name the name of the image
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 */
 	private static void writeImage(RenderedImage ri, String name) throws IOException{
 		new File("DebugImage").mkdirs();
 		ImageIO.write(ri, "png", new File("DebugImage" + File.separator + name + ".png"));
 	}
 	
-	/**
-	 * Building coordinates in image.
-	 *
-	 * @return the polygon edge of the buildings
-	 */
 	public Polygon[] buildingCoordinatesInImage(){
 		int[][] pixels = pixelsFromBufferedImage(imageSection);
 		List<Point> bluePointList = new ArrayList<>();
@@ -105,7 +87,19 @@ public class MapSection {
 				// make sure no repetition happens
 			}
 			oldPoint = currentPoint;
-			Point[] coordinatePoints = starRunner(pixels, currentPoint.x, currentPoint.y, new ArrayList<Point>());			
+			// all on bluelist should be removed from outer bluelist
+			List<Point> starBlueList = new ArrayList<>();
+			Point[] coordinatePoints = starRunner(pixels, currentPoint.x, currentPoint.y, starBlueList);
+			for(int i = 0; i < starBlueList.size(); i++){
+				for(int j = 0; j < bluePointList.size(); j++){
+					final Point star = starBlueList.get(i);
+					final Point blue = bluePointList.get(j);
+					if(star.equals(blue)){
+						bluePointList.remove(j);
+						j--;
+					}
+				}
+			}
 			
 			int[] xes = new int[coordinatePoints.length];
 			int[] ys = new int[coordinatePoints.length];
@@ -138,12 +132,6 @@ public class MapSection {
 		return buildings.toArray(new Polygon[0]);
 	}
 	
-	/**
-	 * Poly area.
-	 *
-	 * @param target the polygon that one can retrieve the area from
-	 * @return the area of target
-	 */
 	public static int polyArea(Polygon target){
 		int sum = 0;
         for (int i = 0; i < target.npoints ; i++){
@@ -153,16 +141,7 @@ public class MapSection {
         return Math.abs(sum / 2);
 	}
 	
-	/**
-	 * Star runner style building edge finder.
-	 *
-	 * @param screen the rgba pixel array 
-	 * @param x the current x coordinate
-	 * @param y the current y coordinate
-	 * @param blueList the blue list (blacklist) of points already covered
-	 * @return a point[] compromised of points of the border of the building outside it
-	 */
-	private Point[] starRunner(int[][] screen, int x, int y, List<Point> blueList){
+	public Point[] starRunner(int[][] screen, int x, int y, List<Point> blueList){
 		if(x < 0 || y < 0 || x >= screen.length || y >= screen[0].length) return new Point[0];
 		
 		Color pixelColor = new Color(screen[x][y], true);
@@ -200,13 +179,6 @@ public class MapSection {
 	}
 	
 	// cleans list of all blue contained in borders, return number of stuff removed
-	/**
-	 * Clean blue point list of blue points contained in a polygon.
-	 *
-	 * @param blueList the existing eligible blue points
-	 * @param borders the borders to be cleared
-	 * @return the number of points removed
-	 */
 	private int cleanList(List<Point> blueList, Polygon borders){
 		int numRemoved = 0;
 		for(int i = 0; i < blueList.size(); i++){
@@ -221,13 +193,7 @@ public class MapSection {
 	}
 	
 		// TODO: Make optimal (http://stackoverflow.com/questions/6524196/java-get-pixel-array-from-image)
-	/**
-		 * Pixels from buffered image.
-		 *
-		 * @param image a buffered image
-		 * @return the rgba pixels in int[][] form
-		 */
-		public static int[][] pixelsFromBufferedImage(final BufferedImage image){
+	public static int[][] pixelsFromBufferedImage(final BufferedImage image){
 		int[][] pixArr = new int[image.getWidth()][image.getHeight()];
 		for(int x = 0; x < image.getWidth(); x++){
 			for(int y = 0; y < image.getHeight(); y++){
@@ -236,7 +202,6 @@ public class MapSection {
 		}
 		return pixArr;
 	}
-	
 	/**
 	 * Process image, clearing it of everything but buildings by going through pixel-by-pixel.
 	 * This is done by creating a band of tolerable greys and eradicating them, as well as some other special values.
@@ -246,7 +211,7 @@ public class MapSection {
 	 * @param tolerancemin the tolerance min for the greyscale bound.
 	 * @return the cleaned image
 	 */
-	private static BufferedImage processImagePixally(final BufferedImage image, int tolerancemax, int tolerancemin){
+	private static BufferedImage processImagePixally(final BufferedImage image, int toleranceMax, int toleranceMin){
 		BufferedImage img = new BufferedImage(
 			    image.getWidth(), 
 			    image.getHeight(), 
@@ -280,7 +245,7 @@ public class MapSection {
 					Arrays.sort(diffCandidates); 
 					diff = diffCandidates[2] - diffCandidates[0];
 					
-					if(tolerancemax >= diff && diff >= tolerancemin){
+					if(toleranceMax >= diff && diff >= toleranceMin){
 						// should be fair game
 						
 					}
