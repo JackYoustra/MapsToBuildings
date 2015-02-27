@@ -85,7 +85,19 @@ public class MapSection {
 				// make sure no repetition happens
 			}
 			oldPoint = currentPoint;
-			Point[] coordinatePoints = starRunner(pixels, currentPoint.x, currentPoint.y, new ArrayList<Point>());			
+			// all on bluelist should be removed from outer bluelist
+			List<Point> starBlueList = new ArrayList<>();
+			Point[] coordinatePoints = starRunner(pixels, currentPoint.x, currentPoint.y, starBlueList);
+			for(int i = 0; i < starBlueList.size(); i++){
+				for(int j = 0; j < bluePointList.size(); j++){
+					final Point star = starBlueList.get(i);
+					final Point blue = bluePointList.get(j);
+					if(star.equals(blue)){
+						bluePointList.remove(j);
+						j--;
+					}
+				}
+			}
 			
 			int[] xes = new int[coordinatePoints.length];
 			int[] ys = new int[coordinatePoints.length];
