@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Scanner;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -26,7 +25,7 @@ public class TestShell {
 	// profiled at (relative) 4.7 seconds
 	public static void main(String[] args) {
 		try {
-			MapSection ms = new MapSection(11, 1, false);
+			MapSection ms = new MapSection(true);
 			
 			//window.add(new JLabel(new ImageIcon(bi)));
 			BufferedImage bi = ms.getImageSection();

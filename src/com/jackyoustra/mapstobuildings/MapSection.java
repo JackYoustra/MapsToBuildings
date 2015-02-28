@@ -2,46 +2,48 @@ package com.jackyoustra.mapstobuildings;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
-import java.awt.image.LookupOp;
-import java.awt.image.LookupTable;
 import java.awt.image.RenderedImage;
-import java.awt.image.ShortLookupTable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 
 import com.jhlabs.image.DilateFilter;
 import com.jhlabs.image.ErodeFilter;
-import com.jhlabs.image.ReduceNoiseFilter;
 
 
 public class MapSection {
 	
 	// https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000
 	private BufferedImage imageSection;
+	/** The max tolerance for the grayscale band. */
+	public final int MAX_TOLERANCE = 11;
 	
+	/** The min tolerance for the grayscale band. */
+	public final int MIN_TOLERANCE = 1;
+	
+	
+	/**
+	 * Gets the underlying image section.
+	 *
+	 * @return the image section
+	 */
 	public BufferedImage getImageSection() {
 		return imageSection;
 	}
-
-	public MapSection(int toleranceMax, int toleranceMin, boolean local) throws IOException{
+	/**
+	 * Instantiates a new building-processed map section.
+	 *
+	 * @param local choose to access a local sample instead of retrieving from the internet
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	public MapSection(boolean local) throws IOException{
 		if(local){
 			File pictureHandle = new File("C:\\Users\\Jack\\Pictures\\staticmapnolabel.png");
 			imageSection = ImageIO.read(pictureHandle);
@@ -51,9 +53,9 @@ public class MapSection {
 			imageSection = ImageIO.read(nonLabelurl);
 		}
 		
-		imageSection = processImagePixally(imageSection, toleranceMax, toleranceMin);
+		imageSection = processImagePixally(imageSection, MAX_TOLERANCE, MIN_TOLERANCE);
 		writeImage(imageSection, "cleanedImage");
-		//writeImage(imageSection, "Max_" + toleranceMax + " Min_" + toleranceMin);
+		//writeImage(imageSection, "Max_" + MAX_TOLERANCE + " Min_" + MIN_TOLERANCE);
 	}
 	
 	private static void writeImage(RenderedImage ri, String name) throws IOException{
@@ -203,7 +205,15 @@ public class MapSection {
 		}
 		return pixArr;
 	}
-	
+	/**
+	 * Process image, clearing it of everything but buildings by going through pixel-by-pixel.
+	 * This is done by creating a band of tolerable greys and eradicating them, as well as some other special values.
+	 *
+	 * @param image the map square to be processed (as an image)
+	 * @param tolerancemax the tolerance max for the greyscale bound.
+	 * @param tolerancemin the tolerance min for the greyscale bound.
+	 * @return the cleaned image
+	 */
 	private static BufferedImage processImagePixally(final BufferedImage image, int toleranceMax, int toleranceMin){
 		BufferedImage img = new BufferedImage(
 			    image.getWidth(), 
