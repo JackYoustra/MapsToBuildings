@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -23,6 +23,7 @@ public class TestShell {
 	 *
 	 * @param args the command-line arguments
 	 */
+	// profiled at (relative) 4.7 seconds
 	public static void main(String[] args) {
 		try {
 			MapSection ms = new MapSection(11, 1, false);
@@ -30,10 +31,12 @@ public class TestShell {
 			//window.add(new JLabel(new ImageIcon(bi)));
 			BufferedImage bi = ms.getImageSection();
 			JFrame window = new JFrame("Image Section");
+			String c = (new Scanner(System.in)).next();
 			long time = System.currentTimeMillis();
 			drawPolygon(bi, ms);
 			time -= System.currentTimeMillis();
-			System.out.println(time);
+			time *=-1;
+			System.out.println("Seconds Elapsed:" + time/1000.0);
 			window.add(new JLabel(new ImageIcon(bi)));
 			
 			window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,6 +54,7 @@ public class TestShell {
 	 * @param ms the underlying map section
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
+	// profiled at (relative) 4.1 seconds
 	public static void drawPolygon(BufferedImage bi, MapSection ms) throws IOException{
 		Polygon[] buildingsBounds = ms.buildingCoordinatesInImage();
 		StringBuilder sb = new StringBuilder();

@@ -61,6 +61,7 @@ public class MapSection {
 		ImageIO.write(ri, "png", new File("DebugImage" + File.separator + name + ".png"));
 	}
 	
+	// prifiled for 4.1 secs, seen 325 times
 	public Polygon[] buildingCoordinatesInImage(){
 		int[][] pixels = pixelsFromBufferedImage(imageSection);
 		List<Point> bluePointList = new ArrayList<>();
@@ -75,16 +76,16 @@ public class MapSection {
 				}
 			}
 		}
-		Point oldPoint = new Point(-1, -1);
+		//Point oldPoint = new Point(-1, -1);
 		while(bluePointList.size() > 0){
 			System.out.println(bluePointList.size());
 			Point currentPoint = bluePointList.get(0);
-			if(oldPoint.equals(currentPoint)){
+			/*if(oldPoint.equals(currentPoint)){
 				bluePointList.remove(0);
 				continue;
 				// make sure no repetition happens
 			}
-			oldPoint = currentPoint;
+			oldPoint = currentPoint;*/
 			// all on bluelist should be removed from outer bluelist
 			List<Point> starBlueList = new ArrayList<>();
 			Point[] coordinatePoints = starRunner(pixels, currentPoint.x, currentPoint.y, starBlueList);
@@ -114,7 +115,7 @@ public class MapSection {
 			}
 			Polygon border = new Polygon(xes, ys, coordinatePoints.length);
 			buildings.add(border);				// clean list
-			cleanList(bluePointList, border); // make sure to go through all
+			cleanList(bluePointList, border); // TODO: Figure out why this causes efficiency when not tired (10 secs!)
 		}
 		
 		// clean buildings
@@ -139,6 +140,7 @@ public class MapSection {
         return Math.abs(sum / 2);
 	}
 	
+	// profiled @ 100 (relative) secs, seen 17,116 times
 	public Point[] starRunner(int[][] screen, int x, int y, List<Point> blueList){
 		if(x < 0 || y < 0 || x >= screen.length || y >= screen[0].length) return new Point[0];
 		
@@ -177,6 +179,7 @@ public class MapSection {
 	}
 	
 	// cleans list of all blue contained in borders, return number of stuff removed
+	// activates 1.598 sec, seen 30 times
 	private int cleanList(List<Point> blueList, Polygon borders){
 		int numRemoved = 0;
 		for(int i = 0; i < blueList.size(); i++){
@@ -190,7 +193,7 @@ public class MapSection {
 		return numRemoved;
 	}
 	
-		// TODO: Make optimal (http://stackoverflow.com/questions/6524196/java-get-pixel-array-from-image)
+		// TODO: Make optimal (http://stackoverflow.com/questions/6524196/java-get-pixel-array-from-image) but actually, only takes 50 mills.
 	public static int[][] pixelsFromBufferedImage(final BufferedImage image){
 		int[][] pixArr = new int[image.getWidth()][image.getHeight()];
 		for(int x = 0; x < image.getWidth(); x++){
