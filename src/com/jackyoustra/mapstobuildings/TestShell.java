@@ -1,11 +1,14 @@
 package com.jackyoustra.mapstobuildings;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Scanner;
+
+import javafx.geometry.Point2D;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -24,26 +27,29 @@ public class TestShell {
 	 */
 	// profiled at (relative) 4.7 seconds
 	public static void main(String[] args) {
-		try {
-			MapSection ms = new MapSection(true);
-			
-			//window.add(new JLabel(new ImageIcon(bi)));
+		
+		//try {
+			/*
+			MapSection ms = new MapSection(false);
 			BufferedImage bi = ms.getImageSection();
-			JFrame window = new JFrame("Image Section");
-			String c = (new Scanner(System.in)).next();
+			
 			long time = System.currentTimeMillis();
 			drawPolygon(bi, ms);
 			time -= System.currentTimeMillis();
 			time *=-1;
 			System.out.println("Seconds Elapsed:" + time/1000.0);
-			window.add(new JLabel(new ImageIcon(bi)));
+			*/
+			JFrame window = new JFrame("Image Section");			
 			
+			//window.add(new JLabel(new ImageIcon(bi)));
 			window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			window.pack();
 			window.setVisible(true);
-		} catch (IOException e) {
+		/*} catch (IOException e) {
 			e.printStackTrace();
 		}
+		*/
+		
 	}
 	
 	/**

@@ -7,10 +7,13 @@ import java.awt.image.ColorConvertOp;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javafx.geometry.Point2D;
 
 import javax.imageio.ImageIO;
 
@@ -23,10 +26,12 @@ public class MapSection {
 	// https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000
 	private BufferedImage imageSection;
 	/** The max tolerance for the grayscale band. */
-	public final int MAX_TOLERANCE = 11;
+	public static final int MAX_TOLERANCE = 11;
 	
 	/** The min tolerance for the grayscale band. */
-	public final int MIN_TOLERANCE = 1;
+	public static final int MIN_TOLERANCE = 1;
+	
+	public static final int zoom = 18;
 	
 	
 	/**
@@ -56,6 +61,24 @@ public class MapSection {
 		imageSection = processImagePixally(imageSection, MAX_TOLERANCE, MIN_TOLERANCE);
 		writeImage(imageSection, "cleanedImage");
 		//writeImage(imageSection, "Max_" + MAX_TOLERANCE + " Min_" + MIN_TOLERANCE);
+	}
+	
+	public MapSection(double latitude, double longitude) throws IOException{
+		URL nonLabelurl = new URL("https://maps.googleapis.com/maps/api/staticmap?center=" + latitude +"," + longitude + "&zoom="+ zoom +"&size=6000x6000&style=feature:all|element:labels|visibility:off&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
+		imageSection = ImageIO.read(nonLabelurl);
+		imageSection = processImagePixally(imageSection, MAX_TOLERANCE, MIN_TOLERANCE);
+		writeImage(imageSection, "cleanedImage");
+	}
+	
+	
+	public static Point2D normPixelToWorldCoordinates(Point normalizedPixel){
+		final double divPoint = Math.pow(2, zoom);
+		return new Point2D(normalizedPixel.x/divPoint, normalizedPixel.y/divPoint);
+	}
+	
+	public static Point worldCoordinatesToNormPixel(Point2D worldCoordinate){
+		final double mulPoint = Math.pow(2, zoom);
+		return new Point((int)Math.round(worldCoordinate.getX()*mulPoint), (int)Math.round(worldCoordinate.getY()*mulPoint));
 	}
 	
 	private static void writeImage(RenderedImage ri, String name) throws IOException{
