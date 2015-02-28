@@ -24,6 +24,7 @@ import com.jhlabs.image.ErodeFilter;
 public class MapSection {
 	
 	// https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000
+	private BufferedImage rawMapImage;
 	private BufferedImage imageSection;
 	/** The max tolerance for the grayscale band. */
 	public static final int MAX_TOLERANCE = 11;
@@ -42,6 +43,15 @@ public class MapSection {
 	public BufferedImage getImageSection() {
 		return imageSection;
 	}
+	
+	/**
+	 * Gets the raw map image.
+	 *
+	 * @return the raw google map image
+	 */
+	public BufferedImage getRawMapImage() {
+		return rawMapImage;
+	}
 	/**
 	 * Instantiates a new building-processed map section.
 	 *
@@ -59,15 +69,20 @@ public class MapSection {
 		}
 		
 		imageSection = processImagePixally(imageSection, MAX_TOLERANCE, MIN_TOLERANCE);
-		writeImage(imageSection, "cleanedImage");
-		//writeImage(imageSection, "Max_" + MAX_TOLERANCE + " Min_" + MIN_TOLERANCE);
 	}
 	
+	/**
+	 * Instantiates a new map section.
+	 *
+	 * @param latitude the latitude of the center of the square in world coordinates
+	 * @param longitude the longitude of the center of the square in world coordinates
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public MapSection(double latitude, double longitude) throws IOException{
 		URL nonLabelurl = new URL("https://maps.googleapis.com/maps/api/staticmap?center=" + latitude +"," + longitude + "&zoom="+ zoom +"&size=6000x6000&style=feature:all|element:labels|visibility:off&key=AIzaSyAeiTCYdp5wB-m9fJskfzKQBW4SWefHyEs");
 		imageSection = ImageIO.read(nonLabelurl);
+		rawMapImage = imageSection;
 		imageSection = processImagePixally(imageSection, MAX_TOLERANCE, MIN_TOLERANCE);
-		writeImage(imageSection, "cleanedImage");
 	}
 	
 	
