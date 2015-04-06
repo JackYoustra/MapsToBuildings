@@ -10,6 +10,9 @@ import javafx.geometry.Point2D;
 import javax.imageio.ImageIO;
 
 
+/**
+ * The Class MapSection. Should hold all things Google inside it.
+ */
 public class MapSection {
 	
 	// https://maps.googleapis.com/maps/api/staticmap?center=40.714728,-73.998672&zoom=18&size=6000x6000
