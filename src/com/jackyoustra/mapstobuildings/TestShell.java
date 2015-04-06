@@ -1,6 +1,5 @@
 package com.jackyoustra.mapstobuildings;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Polygon;
@@ -9,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.geometry.Point2D;
@@ -48,36 +46,30 @@ public class TestShell {
 		// NY coordinates:  40.705345 | Longitude: -74.018812 rfwj park ,Latitude: 40.719603 | Longitude: -74.010035 trib park
 			JFrame window = new JFrame("Image Section");			
 			
-			List<List<BufferedImage>> rowImages = new ArrayList<>();
 			List<List<BufferedImage>> rawRowImages = new ArrayList<>();
 			
 			Point p = MapSection.worldCoordinatesToNormPixel(new Point2D(40.705345,-74.018812));
 			Point2D wc = MapSection.normPixelToWorldCoordinates(p);
 			do{
-				ArrayList<BufferedImage> vertImages = new ArrayList<>();
 				ArrayList<BufferedImage> rawVertImages = new ArrayList<>();
 				p = MapSection.worldCoordinatesToNormPixel(new Point2D(40.705345, wc.getY()));
 				wc = MapSection.normPixelToWorldCoordinates(p);
 				do{
 					MapSection currentSection = new MapSection(wc.getX(), wc.getY());
 					rawVertImages.add(currentSection.getRawMapImage());
-					vertImages.add(currentSection.getImageSection());
 					p.x+=682;
 					wc = MapSection.normPixelToWorldCoordinates(p);
 					
 					
 				}while(wc.getX() < 40.719603);
-				rowImages.add(vertImages);
 				rawRowImages.add(rawVertImages);
 				p.y+=898;
 				wc = MapSection.normPixelToWorldCoordinates(p);
 			}while(wc.getY() < -74.010035);
 
-			BufferedImage combined = mergeImages(rowImages);
 			final BufferedImage rawCombined = mergeImages(rawRowImages);
 			
 			window.add(new JLabel(new ImageIcon(rawCombined)));
-			ImageIO.write(combined, "png", new File("AggregateMap.png"));
 			ImageIO.write(rawCombined, "png", new File("RawAggregateMap.png"));
 			
 			window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -112,8 +104,8 @@ public class TestShell {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	// profiled at (relative) 4.1 seconds
-	public static void drawPolygon(BufferedImage bi, MapSection ms) throws IOException{
-		Polygon[] buildingsBounds = ms.buildingCoordinatesInImage();
+	public static void drawPolygon(BufferedImage bi) throws IOException{
+		Polygon[] buildingsBounds = BuildingUtilities.buildingCoordinatesInImage(bi);
 		StringBuilder sb = new StringBuilder();
 		for(Polygon cp : buildingsBounds){
 			for(int i = 0; i < cp.npoints; i++){
