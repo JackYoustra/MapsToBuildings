@@ -16,26 +16,26 @@ import javafx.geometry.Point2D;
 public class MapAccumulator {
 	// NY coordinates:  40.705345 | Longitude: -74.018812 rfwj park ,Latitude: 40.719603 | Longitude: -74.010035 trib park
 	
-	public static BufferedImage createMacroSection() throws IOException {
+	public static BufferedImage createMacroSection(double startingLatitude, double startingLongitude, double endingLatitude, double endingLongitude) throws IOException {
 		List<List<BufferedImage>> rawRowImages = new ArrayList<>();
 		
 		// x and y are reversed
-		Point p = MapSection.worldCoordinatesToNormPixel(new Point2D(40.705345,-74.018812));
+		Point p = MapSection.worldCoordinatesToNormPixel(new Point2D(startingLatitude,startingLongitude));
 		Point2D wc = MapSection.normPixelToWorldCoordinates(p);
 		do{
 			ArrayList<BufferedImage> rawVertImages = new ArrayList<>();
-			p = MapSection.worldCoordinatesToNormPixel(new Point2D(40.705345, wc.getY()));
+			p = MapSection.worldCoordinatesToNormPixel(new Point2D(startingLatitude, wc.getY()));
 			wc = MapSection.normPixelToWorldCoordinates(p);
 			do{
 				MapSection currentSection = new MapSection(wc.getX(), wc.getY());
 				rawVertImages.add(currentSection.getRawMapImage());
 				p.x+=682;
 				wc = MapSection.normPixelToWorldCoordinates(p);
-			}while(wc.getX() < 40.719603);
+			}while(wc.getX() < endingLatitude);
 			rawRowImages.add(rawVertImages);
 			p.y+=898;
 			wc = MapSection.normPixelToWorldCoordinates(p);
-		}while(wc.getY() < -74.010035);
+		}while(wc.getY() < endingLongitude);
 
 		final BufferedImage rawCombined = mergeImages(rawRowImages);
 		return rawCombined;
