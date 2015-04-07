@@ -53,11 +53,13 @@ public class BuildingUtilities {
 				
 				if(red == 242 && green == 240 && blue == 233){
 					//red = blue = green = 255;
+					System.out.println("blue found");
 					blue = 255;
 					green = red = 0;
 				}
 				else if(red == 196 && green == 196 && blue == 212){
 					// fair game, magic unformulaic value for dark zones
+					System.out.println("dark zones found");
 				}
 				else{
 					// the trick here is to limit it to a particular band of grey
@@ -69,7 +71,7 @@ public class BuildingUtilities {
 					
 					if(toleranceMax >= diff && diff >= toleranceMin){
 						// should be fair game
-						
+						System.out.println("band found");
 					}
 					else{
 						red = blue = green = 0;

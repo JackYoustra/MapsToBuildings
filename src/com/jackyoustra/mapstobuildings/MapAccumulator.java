@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 import javafx.geometry.Point2D;
 
 public class MapAccumulator {
@@ -15,6 +19,7 @@ public class MapAccumulator {
 	public static BufferedImage createMacroSection() throws IOException {
 		List<List<BufferedImage>> rawRowImages = new ArrayList<>();
 		
+		// x and y are reversed
 		Point p = MapSection.worldCoordinatesToNormPixel(new Point2D(40.705345,-74.018812));
 		Point2D wc = MapSection.normPixelToWorldCoordinates(p);
 		do{
@@ -39,15 +44,24 @@ public class MapAccumulator {
 	private static BufferedImage mergeImages(List<List<BufferedImage>> images){
 		final int width = images.size()*640;
 		final int height = images.get(0).size()*640;
-		BufferedImage combined = new BufferedImage(width, height, images.get(0).get(0).getType());
+		BufferedImage combined = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		for(int i = 0; i < images.size(); i++){
 			List<BufferedImage> column = images.get(i);
 			for(int j = 0; j < column.size(); j++){
 				BufferedImage bi = column.get(j);
-				Graphics g = combined.getGraphics();
-				g.drawImage(bi, i*640, (column.size()-j-1)*640, null);
+				//Graphics g = combined.getGraphics();
+				//g.drawImage(bi, i*640, (column.size()-j-1)*640, null);
+				deepMerge(bi, combined, i*640, (column.size()-j-1)*640);
 			}
 		}
 		return combined;
+	}
+	
+	private static void deepMerge(BufferedImage src, BufferedImage dest, int xoffset, int yoffset){
+		for(int x = 0; x < src.getWidth(); x++){
+			for(int y  = 0; y < src.getHeight(); y++){
+				dest.setRGB(x+xoffset, y+yoffset, src.getRGB(x, y));
+			}
+		}
 	}
 }
