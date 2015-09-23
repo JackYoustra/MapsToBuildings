@@ -39,11 +39,11 @@ public class TestShell {
 			*/
 			JFrame window = new JFrame("Image Section");			
 			
-			final BufferedImage rawCombined = MapAccumulator.createMacroSection(40.705345, -74.018812, 40.719603, -74.010035);
+			//final BufferedImage rawCombined = MapAccumulator.createMacroSection(40.705345, -74.018812, 40.719603, -74.010035);
 			final BufferedImage rawCombined = ImageIO.read(new File("RawAggregateMap.png")); // evade google api cost
 			
 			window.add(new JLabel(new ImageIcon(rawCombined)));
-			ImageIO.write(rawCombined, "png", new File("RawAggregateMap.png"));
+			//ImageIO.write(rawCombined, "png", new File("RawAggregateMap.png"));
 			
 			ImageIO.write(BuildingUtilities.processImagePixally(rawCombined), "png", new File("AggregateMap.png"));
 			

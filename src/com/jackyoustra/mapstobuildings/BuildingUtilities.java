@@ -94,8 +94,35 @@ public class BuildingUtilities {
 		return img;
 	}
 	
+	public static Polygon[] buildingCoordinatesInImage(BufferedImage imageSection){
+		int[][] pixels = pixelsFromBufferedImage(imageSection);
+		List<Point> edges = new ArrayList<>();
+		List<Polygon> buildings = new ArrayList<>();
+		
+		for(int x = 0; x < pixels.length; x++){
+			for(int y = 0; y < pixels[0].length; y++){
+				int px = pixels[x][y];
+				if(px != 0){ // is non-black pixel
+					if(x == 0 || y == 0 || x == pixels.length-1 || y == pixels[0].length){
+						edges.add(new Point(x, y));
+					}
+				}
+			}
+		}
+	}
+	
+	public static boolean isEdge(int[][] pixels, Point candidate){
+		if(candidate.x == 0 || candidate.y == 0 || candidate.x == pixels.length-1 || candidate.y == pixels[0].length) return true;
+		for(int x = candidate.x-1; x < candidate.x+1; x++){
+			for(int y = candidate.y-1; y < candidate.y+1; y++){
+				if(pixels[x][y] == 0) return true; // black therefore edge
+			}
+		}
+		return false; // noblack therefore not edge
+	}
+	
 	// profiled for 4.1 secs, seen 325 times
-		public static Polygon[] buildingCoordinatesInImage(BufferedImage imageSection){
+		public static Polygon[] oldBuildingCoordinatesInImage(BufferedImage imageSection){
 			int[][] pixels = pixelsFromBufferedImage(imageSection);
 			List<Point> bluePointList = new ArrayList<>();
 			List<Polygon> buildings = new ArrayList<>();
