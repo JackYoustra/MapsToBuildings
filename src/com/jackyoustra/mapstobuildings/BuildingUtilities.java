@@ -96,25 +96,28 @@ public class BuildingUtilities {
 	
 	public static Polygon[] buildingCoordinatesInImage(BufferedImage imageSection){
 		int[][] pixels = pixelsFromBufferedImage(imageSection);
-		List<Point> edges = new ArrayList<>();
+		EdgeGraph finalGraph = new EdgeGraph();
 		List<Polygon> buildings = new ArrayList<>();
 		
 		for(int x = 0; x < pixels.length; x++){
 			for(int y = 0; y < pixels[0].length; y++){
 				int px = pixels[x][y];
 				if(px != 0){ // is non-black pixel
-					if(x == 0 || y == 0 || x == pixels.length-1 || y == pixels[0].length){
-						edges.add(new Point(x, y));
+					if(isEdge(pixels, x, y)){
+						finalGraph.add(new Point(x, y));
 					}
 				}
 			}
 		}
+		// graph now filled
+		finalGraph.connectNodes();
+		
 	}
 	
-	public static boolean isEdge(int[][] pixels, Point candidate){
-		if(candidate.x == 0 || candidate.y == 0 || candidate.x == pixels.length-1 || candidate.y == pixels[0].length) return true;
-		for(int x = candidate.x-1; x < candidate.x+1; x++){
-			for(int y = candidate.y-1; y < candidate.y+1; y++){
+	public static boolean isEdge(int[][] pixels, int x, int y){
+		if(x == 0 || y == 0 || x == pixels.length-1 || y == pixels[0].length) return true;
+		for(int xOff = x-1; xOff < x+1; xOff++){
+			for(int yOff = y-1; yOff < y+1; yOff++){
 				if(pixels[x][y] == 0) return true; // black therefore edge
 			}
 		}
